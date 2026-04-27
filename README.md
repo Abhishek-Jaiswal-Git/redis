@@ -57,10 +57,10 @@ Run the Streamlit UI:
 
 ```bash
 python3 -m pip install -r requirements.txt
-streamlit run main.py
+streamlit run main.py --server.port 8501
 ```
 
-The UI shows live Top-N rankings, score bars, total players, the current leader, player rank lookup, manual score updates, reset/seed controls, and a live simulation toggle that continuously applies Redis `ZINCRBY` updates.
+The UI shows live Top-N rankings, score bars, total players, the current leader, reset/seed controls, a live simulation toggle, and three requirement tabs: add/update score, retrieve Top-N players, and retrieve a player's rank and score.
 
 The default URL is:
 
@@ -73,7 +73,7 @@ Optional settings:
 ```bash
 PLAYERS=1000 TICKS=60 UPDATES_PER_TICK=50 INTERVAL_MS=250 python3 main.py --cli
 REDIS_URL=redis://34.93.131.87:6380 python3 main.py --cli
-REDIS_URL=redis://34.93.131.87:6380 streamlit run main.py
+REDIS_URL=redis://34.93.131.87:6380 streamlit run main.py --server.port 8501
 ```
 
 If you want to run against local Redis instead:
@@ -137,16 +137,15 @@ Load testing approach:
 4. Compare Redis output against a reference model for correctness.
 5. Increase update rate until p99 latency or CPU crosses the target threshold.
 
-## Alternatives
+## Alternatives Considered
 
 | Option | Pros | Cons |
 | --- | --- | --- |
-| Redis sorted set | Very fast Top-N/rank queries, simple commands, atomic updates | In-memory cost, needs persistence/replication planning |
 | SQL table with index on score | Durable source of truth, familiar operations | High write churn and repeated Top-N queries can become expensive |
 | App memory heap | Very low latency inside one process | Hard to share across instances, restart loses state, rank lookup is awkward |
 | Kafka plus stream processor | Excellent event pipeline and auditability | More moving pieces, not ideal for direct low-latency rank reads |
 
-Production systems often combine these: Redis serves the live leaderboard, while durable storage keeps long-term history and recovery snapshots.
+The implemented solution uses a Redis sorted set. Production systems often combine Redis with one of these alternatives: Redis serves the live leaderboard, while durable storage keeps long-term history and recovery snapshots.
 
 ## Production Notes
 
