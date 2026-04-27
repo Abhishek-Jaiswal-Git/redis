@@ -1,0 +1,13 @@
+[browser]
+gatherUsageStats = false
+
+[layout]
+wideMode = true
+
+[theme]
+base="light"
+
+[server]
+port = 8501
+# This prevents the auto-increment to 8502
+headless = true

@@ -1,7 +1,7 @@
 import json
+import time
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
-
+from typing import Dict, List, Optional, Tuple
 from redis_client import RedisClient
 
 
@@ -63,3 +63,9 @@ class Leaderboard:
         if delta is not None:
             payload["delta"] = delta
         self.redis.command("PUBLISH", self.channel, json.dumps(payload))
+
+    def mass_increment(self, updates: List[Tuple[str, int]]) -> None:
+        """Increments multiple player scores using a single pipeline."""
+        commands = [["ZINCRBY", self.key, delta, p_id] for p_id, delta in updates]
+        self.redis.pipeline(commands)
+

@@ -62,6 +62,19 @@ class RedisClient:
             if not chunk:
                 raise ConnectionError("Redis connection closed")
             self._buffer += chunk
+    def pipeline(self, commands: List[List[Any]]) -> List[Any]:
+        """Sends multiple commands in one go and reads all replies."""
+        if not commands:
+            return []
+        self.connect()
+        assert self._socket is not None
+        
+        # Concatenate all encoded commands into one byte string
+        all_encoded = b"".join([_encode_command(cmd) for cmd in commands])
+        self._socket.sendall(all_encoded)
+        
+        # Read the corresponding number of replies
+        return [self._read_reply() for _ in range(len(commands))]
 
 
 def _encode_command(args: Iterable[Any]) -> bytes:
