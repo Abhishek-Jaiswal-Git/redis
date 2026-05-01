@@ -8,13 +8,12 @@ This document captures the Redis OSS to Redis Enterprise replication setup for P
 
 | Component | Server | Details |
 |---|---|---|
-| Redis OSS Source | Server A | `<SERVER_A_HOSTNAME_OR_IP>` |
-| Redis Enterprise Target | Server B | `<SERVER_B_HOSTNAME_OR_IP>` |
+| Redis OSS Source | Server A | `34.93.131.87` |
+| Redis Enterprise Target | Server B | `35.200.229.232` |
 | Redis OSS Version | Server A | `7.2.0` |
-| Redis OSS Port | Server A | `<CUSTOM_REDIS_OSS_PORT>` |
-| Redis Enterprise Version | Server B | `<REDIS_ENTERPRISE_VERSION>` |
-| Redis Enterprise Database | Server B | `<ENTERPRISE_DATABASE_NAME>` |
-| Redis Enterprise DB Endpoint | Server B | `<ENTERPRISE_DB_ENDPOINT>:<ENTERPRISE_DB_PORT>` |
+| Redis OSS Port | Server A | `6380` |
+| Redis Enterprise Database | Server B | `redis-enterprise` |
+| Redis Enterprise DB Endpoint | Server B | `redis-12000.cluster.local:12000` |
 
 ## 1. Redis OSS Installation - Server A
 
@@ -25,16 +24,9 @@ Redis OSS version `7.2.0` was installed on Server A without Docker.
 ```bash
 redis-server --version
 ```
-
-Expected / captured output:
-
-```text
-<PASTE_REDIS_SERVER_VERSION_OUTPUT_HERE>
-```
-
 Screenshot:
 
-`<PLACEHOLDER: screenshots/server-a-redis-version.png>`
+`![alt text](image-1.png)`
 
 ## 2. Redis OSS Configuration
 
@@ -47,70 +39,10 @@ Persistence was enabled using AOF because it provides the strongest durability g
 Redis OSS configuration file path:
 
 ```text
-<PASTE_FULL_PATH_TO_REDIS_CONF_HERE>
+Part_1/redis.conf
 ```
 
-Example:
 
-```text
-/etc/redis/redis.conf
-```
-
-### Key redis.conf Snippet
-
-```conf
-# Network
-bind 0.0.0.0
-protected-mode yes
-port <CUSTOM_REDIS_OSS_PORT>
-
-# Persistence - AOF enabled for best durability guarantees
-appendonly yes
-appendfilename "appendonly.aof"
-appendfsync always
-
-# Optional RDB snapshotting, if enabled in the implementation
-save 900 1
-save 300 10
-save 60 10000
-
-# Security
-requirepass <REDIS_OSS_PASSWORD_IF_CONFIGURED>
-```
-
-Configuration snapshot:
-
-`<PLACEHOLDER: screenshots/server-a-redis-conf.png>`
-
-### Redis OSS Service Status Snapshot
-
-Command:
-
-```bash
-sudo systemctl status redis
-```
-
-Snapshot:
-
-`<PLACEHOLDER: screenshots/server-a-redis-service-status.png>`
-
-### Redis OSS Connectivity Check
-
-Command:
-
-```bash
-redis-cli -h <SERVER_A_HOSTNAME_OR_IP> -p <CUSTOM_REDIS_OSS_PORT> -a '<REDIS_OSS_PASSWORD_IF_CONFIGURED>' PING
-```
-
-Captured output:
-
-```text
-PONG
-```
-
-Snapshot:
-
-`<PLACEHOLDER: screenshots/server-a-redis-ping.png>`
 
 ## 3. Data Load Using memtier-benchmark
 
@@ -122,67 +54,48 @@ The following command can be run to validate the data load and benchmark results
 
 ```bash
 memtier_benchmark \
-  --server <SERVER_A_HOSTNAME_OR_IP> \
-  --port <CUSTOM_REDIS_OSS_PORT> \
-  --authenticate '<REDIS_OSS_PASSWORD_IF_CONFIGURED>' \
-  --protocol redis \
-  --clients 50 \
-  --threads 4 \
-  --requests 2500 \
-  --key-prefix part1: \
-  --key-minimum 1 \
-  --key-maximum 100000 \
-  --data-size 128 \
-  --ratio 1:0 \
-  --hide-histogram
+  --server=127.0.0.1 \
+  --port=6380 \
+  --protocol=redis \
+  --clients=50 \
+  --threads=4 \
+  --requests=200000 \
+  --data-size=100 \
+  --ratio=1:0 \
+  --pipeline=10 \
+  --key-minimum=1 \
+  --key-maximum=300000
 ```
 
 > The command above writes `50 clients * 4 threads * 2,500 requests = 500,000` SET operations over a key range of `100,000`, ensuring at least `100,000` keys are created.
 
-If authentication was not configured, remove this argument:
-
-```bash
---authenticate '<REDIS_OSS_PASSWORD_IF_CONFIGURED>'
-```
 
 ### Throughput and Latency Results
 
 Paste the captured benchmark summary below:
 
 ```text
-<PASTE_MEMTIER_BENCHMARK_OUTPUT_HERE>
+Part_1/memtier_throughput&latency.txt
 ```
 
-| Metric | Captured Value |
-|---|---:|
-| Total Ops/sec | `<OPS_PER_SEC>` |
-| SET Ops/sec | `<SET_OPS_PER_SEC>` |
-| Average Latency | `<AVG_LATENCY_MS>` |
-| P50 Latency | `<P50_LATENCY_MS>` |
-| P95 Latency | `<P95_LATENCY_MS>` |
-| P99 Latency | `<P99_LATENCY_MS>` |
-
-Benchmark snapshot:
-
-`<PLACEHOLDER: screenshots/memtier-benchmark-results.png>`
 
 ### Redis OSS Key Count Validation
 
 Command:
 
 ```bash
-redis-cli -h <SERVER_A_HOSTNAME_OR_IP> -p <CUSTOM_REDIS_OSS_PORT> -a '<REDIS_OSS_PASSWORD_IF_CONFIGURED>' DBSIZE
+`~/redis-7.2.0/src/redis-cli -p 6380 dbsize`
 ```
 
 Captured output:
 
 ```text
-<PASTE_OSS_DBSIZE_OUTPUT_HERE>
+146172
 ```
 
 Snapshot:
 
-`<PLACEHOLDER: screenshots/server-a-oss-dbsize.png>`
+`Part_1/redis-oss_dbsize.png`
 
 ## 4. Redis Enterprise Installation - Server B
 
