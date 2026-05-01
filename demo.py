@@ -9,7 +9,7 @@ from leaderboard import Leaderboard
 from redis_client import RedisClient
 
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://34.93.131.87:6380")
+REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 PLAYERS = int(os.getenv("PLAYERS", "1000"))
 TICKS = int(os.getenv("TICKS", "30"))
 UPDATES_PER_TICK = int(os.getenv("UPDATES_PER_TICK", "25"))

@@ -19,7 +19,7 @@ from leaderboard import Leaderboard
 from redis_client import RedisClient
 
 
-DEFAULT_REDIS_URL = os.getenv("REDIS_URL", "redis://34.93.131.87:6380")
+DEFAULT_REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 DEFAULT_PLAYERS = int(os.getenv("PLAYERS", "1000"))
 
 
@@ -92,10 +92,10 @@ def main() -> None:
     with st.sidebar:
         st.header("Redis")
         redis_url = st.text_input("URL", value=st.session_state.redis_url)
-        total_players = st.number_input("Players", min_value=10, max_value=100_000, value=st.session_state.players, step=100)
+        total_players = st.number_input("Players", min_value=10, max_value=100_0000, value=st.session_state.players, step=100)
         top_n = st.slider("Top N", min_value=3, max_value=50, value=10)
         auto_refresh = st.toggle("Live simulation", value=st.session_state.live)
-        updates_per_tick = st.slider("Updates per refresh", min_value=1, max_value=1000, value=25)
+        updates_per_tick = st.slider("Updates per refresh", min_value=1, max_value=1000_000, value=25)
         refresh_ms = st.slider("Refresh interval (ms)", min_value=250, max_value=5_000, value=1_000, step=250)
         # Pass the 'leaderboard' object and your 'updates' variable
         
@@ -362,7 +362,7 @@ def render_metrics_dashboard(leaderboard, updates_count):
 
     # Technical Details Expander
     with st.expander("View Raw Performance Specs"):
-        st.write(f"**Redis Node:** 34.93.131.87:6380")
+        st.write(f"**Redis Node:** redis://127.0.0.1:6379")
         st.write(f"**Complexity:** O(log N) for {count} members")
 
 if __name__ == "__main__":
