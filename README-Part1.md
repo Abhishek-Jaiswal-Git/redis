@@ -33,7 +33,7 @@ Persistence was enabled using AOF with `appendfsync always` for the best durabil
 redis.conf file path:
 
 
-![redis conf](Part_1/redis.conf)
+[redis conf](Part_1/redis.conf)
 
 
 Key configuration:
@@ -76,12 +76,12 @@ memtier_benchmark \
 The same command is also saved here:
 
 
-![memtier_benchmark_command](Part_1/memtier_benchmark_command.txt)
+[memtier_benchmark_command](Part_1/memtier_benchmark_command.txt)
 
 Throughput and latency output:
 
 
-![memtier_throughput&latency](Part_1/memtier_throughput&latency.txt)
+[memtier_throughput&latency](Part_1/memtier_throughput&latency.txt)
 
 Redis OSS key count:
 
