@@ -101,29 +101,7 @@ Snapshot:
 
 Redis Enterprise was installed on Server B using the no-DNS setup.
 
-### Redis Enterprise Version Snapshot
 
-Command:
-
-```bash
-rladmin status
-```
-
-Captured output:
-
-```text
-<PASTE_RLADMIN_STATUS_OUTPUT_HERE>
-```
-
-Snapshot:
-
-`<PLACEHOLDER: screenshots/server-b-redis-enterprise-status.png>`
-
-### Redis Enterprise Cluster / Node Snapshot
-
-Snapshot:
-
-`<PLACEHOLDER: screenshots/server-b-enterprise-cluster-nodes.png>`
 
 ## 5. Redis Enterprise Database Configuration
 
@@ -133,31 +111,19 @@ A Redis Enterprise database was created on Server B to receive replication from 
 
 | Field | Value |
 |---|---|
-| Database Name | `<ENTERPRISE_DATABASE_NAME>` |
-| Endpoint | `<ENTERPRISE_DB_ENDPOINT>` |
-| Port | `<ENTERPRISE_DB_PORT>` |
-| Memory Limit | `<DATABASE_MEMORY_LIMIT>` |
-| Persistence | `<PERSISTENCE_SETTING>` |
-| Eviction Policy | `<EVICTION_POLICY>` |
-| Replication Source | `<SERVER_A_HOSTNAME_OR_IP>:<CUSTOM_REDIS_OSS_PORT>` |
+| Database Name | `redis-enterprise` |
+| Endpoint | `redis-12000.cluster.local:12000` |
+| Port | `12000` |
+| Memory Limit | `0.5 GB` |
+| Eviction Policy | `volatile-lru` |
+| Replication Source | `redis://34.93.131.87:6380/` |
 
 ### Redis Enterprise Database Configuration Snapshot
 
 Snapshot:
 
-`<PLACEHOLDER: screenshots/server-b-enterprise-db-config.png>`
+`Part_1/redis-enterprise-db.png`
 
-Optional command output:
-
-```bash
-rladmin status databases
-```
-
-Captured output:
-
-```text
-<PASTE_RLADMIN_DATABASE_STATUS_OUTPUT_HERE>
-```
 
 ## 6. OSS to Redis Enterprise Replication
 
@@ -169,45 +135,12 @@ Replication direction:
 Redis OSS on Server A  --->  Redis Enterprise Database on Server B
 ```
 
-### Replication Configuration
-
-Source:
-
-```text
-<SERVER_A_HOSTNAME_OR_IP>:<CUSTOM_REDIS_OSS_PORT>
-```
-
-Target:
-
-```text
-<ENTERPRISE_DB_ENDPOINT>:<ENTERPRISE_DB_PORT>
-```
-
-Authentication:
-
-```text
-<SOURCE_AUTH_CONFIG_IF_ANY>
-```
-
 ### Redis Enterprise Replication Status Snapshot
 
 Snapshot:
 
-`<PLACEHOLDER: screenshots/server-b-replica-of-status.png>`
+`Part_1/redis-enterprise_status.png`
 
-Optional command / UI evidence:
-
-```text
-<PASTE_REDIS_ENTERPRISE_REPLICATION_STATUS_HERE>
-```
-
-Expected status:
-
-```text
-Replica Of status: Active / Syncing completed
-Source: <SERVER_A_HOSTNAME_OR_IP>:<CUSTOM_REDIS_OSS_PORT>
-Target: <ENTERPRISE_DATABASE_NAME>
-```
 
 ## 7. Key Count Validation After Replication
 
@@ -215,92 +148,66 @@ The number of keys in Redis OSS should match the number of keys in the Redis Ent
 
 ### Redis OSS Key Count
 
-Command:
-
-```bash
-redis-cli -h <SERVER_A_HOSTNAME_OR_IP> -p <CUSTOM_REDIS_OSS_PORT> -a '<REDIS_OSS_PASSWORD_IF_CONFIGURED>' DBSIZE
-```
 
 Captured output:
 
-```text
-<PASTE_OSS_DBSIZE_OUTPUT_HERE>
-```
+Part_1/redis-oss_dbsize.png
 
 ### Redis Enterprise Key Count
 
-Command:
-
-```bash
-redis-cli -h <ENTERPRISE_DB_ENDPOINT> -p <ENTERPRISE_DB_PORT> -a '<ENTERPRISE_DB_PASSWORD_IF_CONFIGURED>' DBSIZE
-```
 
 Captured output:
 
-```text
-<PASTE_ENTERPRISE_DBSIZE_OUTPUT_HERE>
-```
+Part_1/redis-enterprise_dbsize.png
 
 ### Validation Result
 
 | Database | Key Count |
 |---|---:|
-| Redis OSS Source | `<OSS_KEY_COUNT>` |
-| Redis Enterprise Target | `<ENTERPRISE_KEY_COUNT>` |
+| Redis OSS Source | `146172` |
+| Redis Enterprise Target | `146172` |
 
 Result:
 
 ```text
-<PASS_OR_FAIL: Key counts match / Key counts do not match>
+<PASS_OR_FAIL: Key counts match >
 ```
 
-Snapshot:
 
-`<PLACEHOLDER: screenshots/key-count-validation.png>`
+## 8. Issues Faced and Resolution
 
-## 8. Optional Notes: Issues Faced and Resolution
-
-### Issue 1: `<ISSUE_TITLE>`
+### Issue 1: `Connection error`
 
 Problem:
 
 ```text
-<DESCRIBE_WHAT_FAILED_HERE>
+ Connection to server A was failing .
+ Part_1/Connnectivity error.png
 ```
 
 Root cause:
 
 ```text
-<DESCRIBE_ROOT_CAUSE_HERE>
+Format of URL was not complaint.
 ```
 
 Resolution:
 
 ```text
-<DESCRIBE_HOW_IT_WAS_RESOLVED_HERE>
+Tested directly from server b for the connectivity to server a.
+
+Verify Connectivity
+nc -vz 34.93.131.87 6380
+
+Formatted the URL for source DB to make the connection work.
+
 ```
 
 Snapshot:
 
-`<PLACEHOLDER: screenshots/issues/issue-1-resolution.png>`
+`Connection to 34.93.131.87 6380 port [tcp/*] succeeded!`
 
-### Issue 2: `<ISSUE_TITLE>`
 
-Problem:
-
-```text
-<DESCRIBE_WHAT_FAILED_HERE>
-```
-
-Resolution:
-
-```text
-<DESCRIBE_HOW_IT_WAS_RESOLVED_HERE>
-```
-
-Snapshot:
-
-`<PLACEHOLDER: screenshots/issues/issue-2-resolution.png>`
 
 ## Submission Checklist
 
@@ -315,4 +222,3 @@ Snapshot:
 - [ ] Redis Enterprise database configuration snapshot included.
 - [ ] Redis Enterprise replication status snapshot included.
 - [ ] Redis OSS key count matches Redis Enterprise database key count.
-- [ ] Optional failure / resolution notes added, if applicable.
