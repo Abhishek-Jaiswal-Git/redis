@@ -13,8 +13,8 @@ This repository contains a two-part implementation of distributed data systems u
 * **Infrastructure:** Distributed Redis replication
 
 ## 📂 Repository Structure
-* `Part_1/`: Configuration files and documentation for Redis replication. **[Part 1: Redis Setup & Replication](./Part_1/README-Part1.md)**
-* `Part_2/`: Source code for the gaming leaderboard, including `leaderboard.py` and `streamlit_app.py`. **[Part 2: Real-Time Leaderboard](./Part_2/README-Part2.md)**
+* `Part_1/`: Configuration files, snapshots, and supporting Part 1 artifacts. **[README-Part1.md](./README-Part1.md)**
+* `Part_2/`: Source code for the gaming leaderboard, including `leaderboard.py` and `streamlit_app.py`. **[README-Part2.md](./README-Part2.md)**
 
 ## 🚦 Getting Started
 1. Go to the Part 2 app directory: `cd Part_2`
