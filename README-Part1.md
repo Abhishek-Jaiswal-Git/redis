@@ -22,7 +22,7 @@ Redis OSS `7.2.0` was installed on Server A without Docker.
 
 Redis version snapshot:
 
-![Redis OSS version](image-1.png)
+![Redis OSS version](Part_1/redisOSSversion.png)
 
 ## 2. Redis OSS Configuration
 
