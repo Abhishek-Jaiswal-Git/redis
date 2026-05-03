@@ -153,7 +153,7 @@ python3 -m pip install -r requirements.txt
 Start the dashboard:
 
 ```bash
-streamlit run streamlit_app.py --server.port 8501
+python3 -m streamlit run streamlit_app.py --server.port 8501
 ```
 
 Open:

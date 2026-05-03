@@ -180,8 +180,11 @@ def init_state() -> None:
 
 
 def sync_number_controls(source_key: str, target_key: str, minimum: int, maximum: int) -> None:
-    value = int(st.session_state[source_key])
-    st.session_state[target_key] = max(minimum, min(maximum, value))
+    st.session_state[target_key] = clamp_int(st.session_state[source_key], minimum, maximum)
+
+
+def clamp_int(value, minimum: int, maximum: int) -> int:
+    return max(minimum, min(maximum, int(value)))
 
 
 def connect(redis_url: str) -> RedisClient:
@@ -311,15 +314,6 @@ def render_functional_requirements(leaderboard: Leaderboard, top_n: int) -> None
                 st.rerun()
 
     with top_tab:
-        st.session_state.retrieve_top_n_slider = min(
-            MAX_RETRIEVE_TOP_N,
-            max(1, int(st.session_state.get("retrieve_top_n_slider", top_n))),
-        )
-        st.session_state.retrieve_top_n_box = min(
-            MAX_RETRIEVE_TOP_N,
-            max(1, int(st.session_state.get("retrieve_top_n_box", top_n))),
-        )
-
         top_slider_col, top_input_col = st.columns([1.6, 1])
         with top_slider_col:
             st.slider(

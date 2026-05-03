@@ -57,7 +57,7 @@ def main() -> int:
             )
     except (ConnectionError, OSError) as error:
         print(error, file=sys.stderr)
-        print("Start Redis first, then run: python3 src/demo.py", file=sys.stderr)
+        print("Start Redis first, then run: python3 demo.py", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         return 0

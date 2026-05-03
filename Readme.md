@@ -17,5 +17,6 @@ This repository contains a two-part implementation of distributed data systems u
 * `Part_2/`: Source code for the gaming leaderboard, including `leaderboard.py` and `streamlit_app.py`. **[Part 2: Real-Time Leaderboard](./Part_2/README-Part2.md)**
 
 ## 🚦 Getting Started
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the dashboard: `streamlit run streamlit_app.py`
+1. Go to the Part 2 app directory: `cd Part_2`
+2. Install dependencies: `python3 -m pip install -r requirements.txt`
+3. Run the dashboard: `python3 -m streamlit run streamlit_app.py --server.port 8501`

@@ -56,7 +56,7 @@ save ""
 
 Data was loaded into Redis OSS using `memtier-benchmark`.
 
-Command used:
+Command used on Server A:
 
 ```bash
 memtier_benchmark \
@@ -78,10 +78,12 @@ The same command is also saved here:
 
 [memtier_benchmark_command](memtier_benchmark_command.txt)
 
-Throughput and latency output:
+Throughput and latency output file:
 
 
 [memtier_throughput&latency](memtier_throughput&latency.txt)
+
+Note: add the captured `memtier-benchmark` throughput and latency summary to this file before final submission.
 
 Redis OSS key count:
 
