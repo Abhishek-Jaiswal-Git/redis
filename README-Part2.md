@@ -201,9 +201,3 @@ redis-cli -h 127.0.0.1 -p 6379 ZREVRANGE leaderboard:game:global 0 9 WITHSCORES
 redis-cli -h 127.0.0.1 -p 6379 ZREVRANK leaderboard:game:global player:0001
 redis-cli -h 127.0.0.1 -p 6379 ZSCORE leaderboard:game:global player:0001
 ```
-
-### 5. Code Sanity Check
-
-```bash
-PYTHONPYCACHEPREFIX=/tmp/python-cache python3 -m py_compile redis_client.py leaderboard.py demo_data.py demo.py streamlit_app.py
-```
