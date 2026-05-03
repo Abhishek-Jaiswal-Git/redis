@@ -125,6 +125,7 @@ Performance validation:
 - Increase updates per refresh in the Streamlit dashboard and monitor Redis latency.
 - Compare Redis command output against the UI output while the simulation is running.
 
+
 ## Run and Verification Steps
 
 From the repository root, enter the `Part_2` directory before running the demo commands:
@@ -203,3 +204,20 @@ redis-cli -h 127.0.0.1 -p 6379 ZREVRANGE leaderboard:game:global 0 9 WITHSCORES
 redis-cli -h 127.0.0.1 -p 6379 ZREVRANK leaderboard:game:global player:0001
 redis-cli -h 127.0.0.1 -p 6379 ZSCORE leaderboard:game:global player:0001
 ```
+
+## Future and Production Improvements
+
+- Use Redis Enterprise, Redis Cloud, or Redis Cluster for high availability instead of a single local Redis instance.
+- Add authentication, TLS, network access controls, and secret management for Redis connection credentials.
+- Use explicit connection pool sizing and retry/backoff policies in the Redis client.
+- Add structured logs, metrics, and tracing around Redis commands, especially `ZADD`, `ZINCRBY`, `ZREVRANGE`, `ZREVRANK`, and `ZSCORE`.
+- Store score update events in a durable system such as Redis Streams, Kafka, or a database so scores can be audited and replayed.
+- Keep one sorted set per game, region, season, or tournament, for example `leaderboard:<gameId>:<seasonId>:global`.
+- Add TTLs or archival jobs for short-lived leaderboards such as daily events or limited-time tournaments.
+- Define deterministic tie-breaking rules for players with the same score, such as using last update time or a secondary score.
+- Add automated tests that compare Redis leaderboard output against an in-memory reference model.
+- Add load tests for write-heavy score updates, high-frequency Top-N reads, and many concurrent dashboard/API clients.
+- Add API endpoints or WebSocket/SSE updates so UI clients can receive leaderboard changes without polling.
+- Add rate limiting and input validation to protect score update endpoints.
+- Separate live leaderboard state from long-term player profile data, storing only ranking fields in Redis.
+- Add backup, restore, failover, and disaster recovery procedures for production Redis deployments.
