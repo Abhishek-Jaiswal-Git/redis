@@ -83,7 +83,6 @@ Throughput and latency output file:
 
 [memtier_throughput&latency](memtier_throughput&latency.txt)
 
-Note: add the captured `memtier-benchmark` throughput and latency summary to this file before final submission.
 
 Redis OSS key count:
 
