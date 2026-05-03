@@ -6,9 +6,9 @@ This demo implements a real-time gaming leaderboard using local Redis. Player sc
 
 ```mermaid
 flowchart LR
-    A["CLI demo<br/>Part_2/demo.py"] --> C["Leaderboard service<br/>Part_2/leaderboard.py"]
-    B["Streamlit dashboard<br/>Part_2/streamlit_app.py"] --> C
-    C --> D["Redis client<br/>Part_2/redis_client.py"]
+    A["CLI demo<br/>demo.py"] --> C["Leaderboard service<br/>Part_2/leaderboard.py"]
+    B["Streamlit dashboard<br/>streamlit_app.py"] --> C
+    C --> D["Redis client<br/>redis_client.py"]
     D --> E["Local Redis<br/>127.0.0.1:6379"]
     E --> F["Sorted Set<br/>leaderboard:game:global"]
     E --> G["Pub/Sub Channel<br/>leaderboard:updates"]
