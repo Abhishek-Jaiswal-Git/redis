@@ -8,7 +8,7 @@ This repository contains a two-part implementation of distributed data systems u
 
 ## 🛠 Tech Stack
 * **Database:** Redis (OSS & Enterprise)
-* **Language:** Python
+* **Language:** Python with the official `redis` package
 * **Frontend:** Streamlit for real-time visualization
 * **Infrastructure:** Distributed Redis replication
 

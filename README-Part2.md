@@ -6,7 +6,7 @@ This demo implements a real-time gaming leaderboard using local Redis. Player sc
 
 ```mermaid
 flowchart LR
-    A["CLI demo<br/>demo.py"] --> C["Leaderboard service<br/>=leaderboard.py"]
+    A["CLI demo<br/>demo.py"] --> C["Leaderboard service<br/>leaderboard.py"]
     B["Streamlit dashboard<br/>streamlit_app.py"] --> C
     C --> D["Redis client<br/>redis_client.py"]
     D --> E["Local Redis<br/>127.0.0.1:6379"]
@@ -19,6 +19,7 @@ flowchart LR
 Assumptions:
 
 - Redis runs locally on `127.0.0.1:6379`.
+- The Python app uses the official `redis` package through `redis_client.py`.
 - The demo uses one global leaderboard.
 - Player IDs are generated as `player:0001`, `player:0002`, and so on.
 - Scores are numeric values.
@@ -88,6 +89,7 @@ Redis value for this solution:
 - Score updates are atomic.
 - Rank lookup and score lookup use the same live data source.
 - Redis keeps the leaderboard fast enough for frequent updates from many active players.
+- The official Python Redis client provides production-friendly connection handling, command helpers, and pipelining.
 
 Alternatives considered:
 

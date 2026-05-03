@@ -390,7 +390,7 @@ def render_metrics_dashboard(leaderboard, updates_count):
     
     # 1. Performance Validation (Latency)
     start_time = time.perf_counter()
-    top_10 = leaderboard.top_n(1)
+    top_10 = leaderboard.top_n(10)
     latency = (time.perf_counter() - start_time) * 1000
     count = leaderboard.count()
     top_10 = leaderboard.top_n(10)

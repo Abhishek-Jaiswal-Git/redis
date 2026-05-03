@@ -1,5 +1,4 @@
 import json
-import time
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 from redis_client import RedisClient
@@ -17,33 +16,33 @@ class Leaderboard:
         self.channel = channel
 
     def reset(self) -> None:
-        self.redis.command("DEL", self.key)
+        self.redis.delete(self.key)
 
     def update_score(self, player_id: str, score: int) -> None:
-        self.redis.command("ZADD", self.key, score, player_id)
+        self.redis.zadd(self.key, {player_id: score})
         self._publish_score(player_id, score)
 
     def increment_score(self, player_id: str, delta: int) -> int:
-        new_score = int(float(self.redis.command("ZINCRBY", self.key, delta, player_id)))
+        new_score = int(self.redis.zincrby(self.key, delta, player_id))
         self._publish_score(player_id, new_score, delta)
         return new_score
 
     def top_n(self, limit: int = 10) -> List[Dict[str, object]]:
-        response = self.redis.command("ZREVRANGE", self.key, 0, limit - 1, "WITHSCORES")
+        response = self.redis.zrevrange(self.key, 0, limit - 1, withscores=True)
         rows = []
-        for index in range(0, len(response), 2):
+        for index, (player_id, score) in enumerate(response):
             rows.append(
                 {
-                    "rank": index // 2 + 1,
-                    "player_id": response[index],
-                    "score": int(float(response[index + 1])),
+                    "rank": index + 1,
+                    "player_id": player_id,
+                    "score": int(score),
                 }
             )
         return rows
 
     def get_player(self, player_id: str) -> Dict[str, Optional[object]]:
-        rank = self.redis.command("ZREVRANK", self.key, player_id)
-        score = self.redis.command("ZSCORE", self.key, player_id)
+        rank = self.redis.zrevrank(self.key, player_id)
+        score = self.redis.zscore(self.key, player_id)
         return {
             "player_id": player_id,
             "rank": None if rank is None else int(rank) + 1,
@@ -51,7 +50,7 @@ class Leaderboard:
         }
 
     def count(self) -> int:
-        return int(self.redis.command("ZCARD", self.key))
+        return self.redis.zcard(self.key)
 
     def _publish_score(self, player_id: str, score: int, delta: Optional[int] = None) -> None:
         payload = {
@@ -62,10 +61,8 @@ class Leaderboard:
         }
         if delta is not None:
             payload["delta"] = delta
-        self.redis.command("PUBLISH", self.channel, json.dumps(payload))
+        self.redis.publish(self.channel, json.dumps(payload))
 
     def mass_increment(self, updates: List[Tuple[str, int]]) -> None:
         """Increments multiple player scores using a single pipeline."""
-        commands = [["ZINCRBY", self.key, delta, p_id] for p_id, delta in updates]
-        self.redis.pipeline(commands)
-
+        self.redis.pipeline_zincrby(self.key, updates)
