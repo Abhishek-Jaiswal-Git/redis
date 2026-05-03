@@ -21,6 +21,8 @@ from redis_client import RedisClient
 
 DEFAULT_REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 DEFAULT_PLAYERS = int(os.getenv("PLAYERS", "1000"))
+MAX_UPDATES_PER_REFRESH = 1_000_000
+MAX_RETRIEVE_TOP_N = 10_000
 
 
 
@@ -95,7 +97,26 @@ def main() -> None:
         total_players = st.number_input("Players", min_value=10, max_value=100_0000, value=st.session_state.players, step=100)
         top_n = st.slider("Top N", min_value=3, max_value=50, value=10)
         auto_refresh = st.toggle("Live simulation", value=st.session_state.live)
-        updates_per_tick = st.slider("Updates per refresh", min_value=1, max_value=1000_000, value=25)
+        updates_slider_col, updates_input_col = st.columns([1.6, 1])
+        with updates_slider_col:
+            st.slider(
+                "Updates per refresh",
+                min_value=1,
+                max_value=MAX_UPDATES_PER_REFRESH,
+                key="updates_per_refresh_slider",
+                on_change=sync_number_controls,
+                args=("updates_per_refresh_slider", "updates_per_refresh_box", 1, MAX_UPDATES_PER_REFRESH),
+            )
+        with updates_input_col:
+            updates_per_tick = st.number_input(
+                "Value",
+                min_value=1,
+                max_value=MAX_UPDATES_PER_REFRESH,
+                step=1,
+                key="updates_per_refresh_box",
+                on_change=sync_number_controls,
+                args=("updates_per_refresh_box", "updates_per_refresh_slider", 1, MAX_UPDATES_PER_REFRESH),
+            )
         refresh_ms = st.slider("Refresh interval (ms)", min_value=250, max_value=5_000, value=1_000, step=250)
         # Pass the 'leaderboard' object and your 'updates' variable
         
@@ -149,9 +170,18 @@ def init_state() -> None:
         "live": False,
         "last_tick_ms": 0.0,
         "last_changed": None,
+        "updates_per_refresh_slider": 25,
+        "updates_per_refresh_box": 25,
+        "retrieve_top_n_slider": 10,
+        "retrieve_top_n_box": 10,
     }
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
+
+
+def sync_number_controls(source_key: str, target_key: str, minimum: int, maximum: int) -> None:
+    value = int(st.session_state[source_key])
+    st.session_state[target_key] = max(minimum, min(maximum, value))
 
 
 def connect(redis_url: str) -> RedisClient:
@@ -281,9 +311,37 @@ def render_functional_requirements(leaderboard: Leaderboard, top_n: int) -> None
                 st.rerun()
 
     with top_tab:
-        requested_top_n = st.slider("N", 1, 100, top_n, key="req_top_n_slider")
+        st.session_state.retrieve_top_n_slider = min(
+            MAX_RETRIEVE_TOP_N,
+            max(1, int(st.session_state.get("retrieve_top_n_slider", top_n))),
+        )
+        st.session_state.retrieve_top_n_box = min(
+            MAX_RETRIEVE_TOP_N,
+            max(1, int(st.session_state.get("retrieve_top_n_box", top_n))),
+        )
+
+        top_slider_col, top_input_col = st.columns([1.6, 1])
+        with top_slider_col:
+            st.slider(
+                "N",
+                min_value=1,
+                max_value=MAX_RETRIEVE_TOP_N,
+                key="retrieve_top_n_slider",
+                on_change=sync_number_controls,
+                args=("retrieve_top_n_slider", "retrieve_top_n_box", 1, MAX_RETRIEVE_TOP_N),
+            )
+        with top_input_col:
+            requested_top_n = st.number_input(
+                "Top N value",
+                min_value=1,
+                max_value=MAX_RETRIEVE_TOP_N,
+                step=1,
+                key="retrieve_top_n_box",
+                on_change=sync_number_controls,
+                args=("retrieve_top_n_box", "retrieve_top_n_slider", 1, MAX_RETRIEVE_TOP_N),
+            )
         # Ensure dataframe uses the full column width
-        st.dataframe(leaderboard.top_n(requested_top_n), hide_index=True, use_container_width=True)
+        st.dataframe(leaderboard.top_n(int(requested_top_n)), hide_index=True, use_container_width=True)
 
     with player_tab:
         # Layout columns: Input | Rank | Score
